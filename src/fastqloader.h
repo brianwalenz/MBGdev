@@ -114,13 +114,22 @@ public:
 		}
 		bool fastq = false;
 		bool fasta = false;
-		if (filename.substr(filename.size()-6) == ".fastq") fastq = true;
-		if (filename.substr(filename.size()-3) == ".fq") fastq = true;
-		if (filename.substr(filename.size()-6) == ".fasta") fasta = true;
-		if (filename.substr(filename.size()-3) == ".fa") fasta = true;
+		bool stdin = false;
+		if ((filename.size() > 6) && (filename.substr(filename.size()-6) == ".fastq")) fastq = true;
+		if ((filename.size() > 3) && (filename.substr(filename.size()-3)) == ".fq") fastq = true;
+		if ((filename.size() > 6) && (filename.substr(filename.size()-6)) == ".fasta") fasta = true;
+		if ((filename.size() > 3) && (filename.substr(filename.size()-3)) == ".fa") fasta = true;
+		if (filename == "-.fastq") fastq = stdin = true;
+		if (filename == "-.fq") fastq = stdin = true; 
+		if (filename == "-.fasta") fasta = stdin = true;
+		if (filename == "-.fa") fasta = stdin = true;
 		if (fasta)
 		{
-			if (gzipped)
+			if (stdin)
+			{
+				streamFastqFastaFromStream(std::cin, includeQuality, f);
+			}
+			else if (gzipped)
 			{
 				streamFastqFastaFromGzippedFile(originalFilename, includeQuality, f);
 				return;
@@ -133,7 +142,11 @@ public:
 		}
 		if (fastq)
 		{
-			if (gzipped)
+			if (stdin)
+			{
+				streamFastqFastqFromStream(std::cin, includeQuality, f);
+			}
+			else if (gzipped)
 			{
 				streamFastqFastqFromGzippedFile(originalFilename, includeQuality, f);
 				return;
